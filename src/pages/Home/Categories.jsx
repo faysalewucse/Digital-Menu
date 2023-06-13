@@ -24,7 +24,7 @@ const Categories = ({ selectedCategory, setSelectedCategory }) => {
   };
 
   return (
-    <Box padding={5}>
+    <Box>
       <Stack spacing={1} alignItems="center" justifyContent="center">
         {categories?.map((category, index) => (
           <Stack
@@ -33,13 +33,13 @@ const Categories = ({ selectedCategory, setSelectedCategory }) => {
             whileHover={{
               scale: 1.05,
             }}
-            initial={{ y: -20 }}
+            initial={{ y: -5 }}
             animate={{ y: 0 }}
             transition={{
-              delay: index / 30,
-              duration: 0.1,
+              delay: (index * 5) / 60,
+              duration: 0.5,
               type: "spring",
-              stiffness: 20,
+              stiffness: 100,
             }}
           >
             <Chip
@@ -51,7 +51,7 @@ const Categories = ({ selectedCategory, setSelectedCategory }) => {
                   category.strCategory === selectedCategory
                     ? "#22c55e"
                     : "#86efac",
-                paddingX: 2,
+                padding: 3,
                 fontSize: 15,
                 borderRadius: 3,
                 color:

@@ -9,16 +9,19 @@ import {
   Grid,
   Pagination,
   Stack,
+  TextField,
   Typography,
 } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
-const PAGE_SIZE = 10; //env variable
-
 export const FoodItems = ({ selectedCategory }) => {
+  const [url, setUrl] = useState(
+    `${import.meta.env.VITE_CATEGORY_SEARCH_API}${selectedCategory}`
+  );
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchMeal, setSearchMeal] = useState(1);
 
   const {
     isLoading,
@@ -28,12 +31,11 @@ export const FoodItems = ({ selectedCategory }) => {
   } = useQuery({
     queryKey: ["foodItems", selectedCategory],
     queryFn: async () => {
-      const response = await axios.get(
-        `https://www.themealdb.com/api/json/v1/1/filter.php?c=${selectedCategory}`
-      );
+      const response = await axios.get(url);
       const meals = response.data.meals || [];
-      const startIndex = (currentPage - 1) * PAGE_SIZE;
-      const endIndex = startIndex + PAGE_SIZE;
+      const startIndex =
+        (currentPage - 1) * import.meta.env.VITE_FOODITEMS_PER_PAGE;
+      const endIndex = startIndex + import.meta.env.VITE_FOODITEMS_PER_PAGE;
       return {
         length: meals.length,
         foodItems: meals.slice(startIndex, endIndex),
@@ -44,7 +46,7 @@ export const FoodItems = ({ selectedCategory }) => {
   useEffect(() => {
     // Call refetch whenever the searchValue changes
     refetch();
-  }, [selectedCategory, refetch, currentPage]);
+  }, [selectedCategory, refetch, currentPage, url]);
 
   if (isLoading) {
     return (
@@ -57,18 +59,42 @@ export const FoodItems = ({ selectedCategory }) => {
     );
   }
 
+  const handleSearch = (event) => {
+    setSearchMeal(event.target.value);
+
+    if (event.target.value === "")
+      return setUrl(
+        `${import.meta.env.VITE_CATEGORY_SEARCH_API}${selectedCategory}`
+      );
+    setUrl(`${import.meta.env.VITE_FOOD_SEARCH_API}${searchMeal}`);
+  };
+
   return (
-    <Box paddingY={5}>
+    <Box>
       <Container maxWidth="xl">
-        <Grid container spacing={5} columns={{ xs: 2, sm: 8, md: 16 }}>
+        <TextField
+          label="Search Food"
+          variant="outlined"
+          color="success"
+          size="small"
+          focused
+          sx={{ marginBottom: 2, width: "30%" }}
+          InputProps={{
+            sx: {
+              borderRadius: 2,
+            },
+          }}
+          onKeyDown={handleSearch}
+        />
+        <Grid container spacing={5} columns={{ xs: 12, sm: 4, md: 9, lg: 16 }}>
           {foodData?.foodItems?.map((food) => (
-            <Grid item xs={2} sm={4} md={4} key={food.idMeal}>
+            <Grid item xs={12} sm={2} md={3} lg={4} key={food.idMeal}>
               <Card
                 key={food.idMeal}
                 sx={{
-                  maxWidth: 345,
-                  height: 315,
+                  height: 350,
                   borderRadius: 5,
+                  border: "7px solid #22c55e",
                   boxShadow: "5px 5px 20px 5px rgba(0,0,0,0.1)",
                 }}
               >
@@ -106,7 +132,9 @@ export const FoodItems = ({ selectedCategory }) => {
           <Pagination
             variant="outlined"
             color="success"
-            count={Math.ceil(foodData.length / PAGE_SIZE)}
+            count={Math.ceil(
+              foodData.length / import.meta.env.VITE_FOODITEMS_PER_PAGE
+            )}
             onChange={(e, page) => setCurrentPage(page)}
             shape="rounded"
           />
