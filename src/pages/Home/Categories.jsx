@@ -2,7 +2,6 @@ import { Chip, Stack, Box } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { motion } from "framer-motion";
-import { Container } from "postcss";
 
 const Categories = ({ selectedCategory, setSelectedCategory }) => {
   const {
@@ -33,7 +32,7 @@ const Categories = ({ selectedCategory, setSelectedCategory }) => {
             whileHover={{
               scale: 1.05,
             }}
-            initial={{ y: -5 }}
+            initial={{ y: -10 }}
             animate={{ y: 0 }}
             transition={{
               delay: (index * 5) / 60,

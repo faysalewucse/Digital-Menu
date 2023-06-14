@@ -9,53 +9,40 @@ import Container from "@mui/material/Container";
 import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
-import { useState } from "react";
-import {
-  Clear,
-  DarkMode,
-  Fastfood,
-  LightMode,
-  Search,
-} from "@mui/icons-material";
-import { InputAdornment, TextField } from "@mui/material";
+import { useEffect, useState } from "react";
+import { DarkMode, Fastfood, LightMode } from "@mui/icons-material";
+import { useQueryClient } from "@tanstack/react-query";
 
 const navItems = ["Products", "Pricing", "Blog"];
 
 export const Navbar = ({ darkMode, setDarkMode }) => {
   const [anchorElNav, setAnchorElNav] = useState(null);
-  const [anchorElUser, setAnchorElUser] = useState(null);
-
-  const [searchValue, setSearchValue] = useState("");
-
-  const handleSearchChange = (event) => {
-    setSearchValue(event.target.value);
-  };
-
-  const handleClearSearch = () => {
-    setSearchValue("");
-  };
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
-  };
-  const handleOpenUserMenu = (event) => {
-    setAnchorElUser(event.currentTarget);
   };
 
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
   };
 
-  const handleCloseUserMenu = () => {
-    setAnchorElUser(null);
-  };
-
   return (
     <AppBar position="static" color="success">
       <Container maxWidth="xl">
-        <Toolbar disableGutters>
+        <Toolbar
+          disableGutters
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            paddingY: 2,
+          }}
+        >
           <Fastfood
-            sx={{ display: { xs: "none", md: "flex", color: "white" }, mr: 1 }}
+            sx={{
+              display: { color: "white", fontSize: 45 },
+              mr: 1,
+            }}
           />
           <Typography
             variant="h6"
@@ -64,84 +51,15 @@ export const Navbar = ({ darkMode, setDarkMode }) => {
             href="/"
             sx={{
               mr: 2,
-              display: { xs: "none", md: "flex" },
-              fontFamily: "monospace",
+              fontFamily: "poppins",
               fontWeight: 700,
-              letterSpacing: ".3rem",
+              fontSize: 25,
               color: "white",
               textDecoration: "none",
             }}
           >
-            Menu
+            Digital Menu Card
           </Typography>
-
-          <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
-            <IconButton
-              size="large"
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleOpenNavMenu}
-              color="inherit"
-            >
-              <MenuIcon />
-            </IconButton>
-            <Menu
-              id="menu-appbar"
-              anchorEl={anchorElNav}
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "left",
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "left",
-              }}
-              open={Boolean(anchorElNav)}
-              onClose={handleCloseNavMenu}
-              sx={{
-                display: { xs: "block", md: "none" },
-              }}
-            >
-              {navItems.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography textAlign="center">{page}</Typography>
-                </MenuItem>
-              ))}
-            </Menu>
-          </Box>
-
-          <AdbIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} />
-          <Typography
-            variant="h5"
-            noWrap
-            component="a"
-            href=""
-            sx={{
-              mr: 2,
-              display: { xs: "flex", md: "none" },
-              flexGrow: 1,
-              fontFamily: "monospace",
-              fontWeight: 700,
-              letterSpacing: ".3rem",
-              color: "inherit",
-              textDecoration: "none",
-            }}
-          >
-            LOGO
-          </Typography>
-          <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-            {navItems.map((page) => (
-              <Button
-                key={page}
-                onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: "white", display: "block" }}
-              >
-                {page}
-              </Button>
-            ))}
-          </Box>
 
           {/* Dark/Light Button */}
           <IconButton
