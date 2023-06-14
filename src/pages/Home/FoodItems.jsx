@@ -46,17 +46,19 @@ export const FoodItems = ({ selectedCategory }) => {
     position: "absolute",
     top: "50%",
     left: "50%",
-    display: "flex",
+    height: { sm: "50%", xs: "80%" },
+    display: { md: "flex" },
     aligItems: "center",
     justifyContent: "center",
     transform: "translate(-50%, -50%)",
-    width: "50vw",
+    width: { sm: "50vw", xs: "90vw" },
     bgcolor: "background.paper",
     border: "5px solid #22c55e",
     borderRadius: 3,
     boxShadow: 24,
     p: 4,
     outline: "none",
+    overflowY: { xs: "auto" },
   };
   // For Modal
 
@@ -206,9 +208,25 @@ export const FoodItems = ({ selectedCategory }) => {
             aria-describedby="modal-modal-description"
           >
             <Box sx={style}>
-              <ReactPlayer width="50%" url={foodDetails?.strYoutube} />
+              <Box
+                sx={{
+                  width: { xs: "100%" },
+                  height: { sm: "100%", xs: "30%" },
+                }}
+              >
+                <ReactPlayer
+                  width="100%"
+                  height="100%"
+                  url={foodDetails?.strYoutube}
+                />
+              </Box>
               <CardContent
-                sx={{ display: "flex", flexDirection: "column", width: "50%" }}
+                sx={{
+                  display: "flex",
+                  textAlign: { xs: "center" },
+                  flexDirection: "column",
+                  width: { sm: "50%" },
+                }}
               >
                 <Typography
                   variant="body"
@@ -262,20 +280,18 @@ export const FoodItems = ({ selectedCategory }) => {
                     "& > *:not(:last-child)": {
                       marginRight: 2,
                     },
+                    justifyContent: { xs: "center" },
                   }}
                   variant="body"
                 >
-                  {[...Array(20).keys()].map((number) => {
+                  {[...Array(10).keys()].map((number) => {
                     const ingredient =
                       foodDetails?.["strIngredient" + (number + 1)];
 
-                    {
-                      number !== 1 && ",";
-                    }
                     if (ingredient) {
                       return (
                         <Typography key={number} variant="body">
-                          {ingredient}
+                          {number + 1}. {ingredient}
                         </Typography>
                       );
                     }
