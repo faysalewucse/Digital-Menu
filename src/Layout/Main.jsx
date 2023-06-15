@@ -10,7 +10,7 @@ export const Main = () => {
     palette: {
       mode: darkMode ? "dark" : "light",
       success: {
-        light: "#4ade80",
+        light: "#dcfce7",
         main: "#22c55e",
         dark: "#4ade80",
       },

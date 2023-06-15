@@ -3,10 +3,18 @@ import {
   Card,
   CardContent,
   CardMedia,
+  Checkbox,
+  Chip,
   Container,
+  FormControl,
   Grid,
+  InputLabel,
+  ListItemText,
+  MenuItem,
   Modal,
+  OutlinedInput,
   Pagination,
+  Select,
   Stack,
   TextField,
   Typography,
@@ -23,6 +31,30 @@ export const FoodItems = ({ selectedCategory }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchValue, setSearchValue] = useState("");
   const [foodDetails, setFoodDetails] = useState(null);
+  const [personName, setPersonName] = useState([]);
+
+  const handleChange = (event) => {
+    const {
+      target: { value },
+    } = event;
+    setPersonName(
+      // On autofill we get a stringified value.
+      typeof value === "string" ? value.split(",") : value
+    );
+  };
+
+  const names = [
+    "Oliver Hansen",
+    "Van Henry",
+    "April Tucker",
+    "Ralph Hubbard",
+    "Omar Alexander",
+    "Carlos Abbott",
+    "Miriam Wagner",
+    "Bradley Wilkerson",
+    "Virginia Andrews",
+    "Kelly Snyder",
+  ];
 
   // For Modal
   const [open, setOpen] = useState(false);
@@ -109,7 +141,7 @@ export const FoodItems = ({ selectedCategory }) => {
 
   return (
     <Box>
-      <Container maxWidth="xl">
+      <Container maxWidth="xl" sx={{ marginBottom: 2 }}>
         <TextField
           label="Search Food"
           variant="outlined"
@@ -127,6 +159,39 @@ export const FoodItems = ({ selectedCategory }) => {
           }}
           onKeyDown={handleSearch}
         />
+        <FormControl sx={{ width: { md: "70%", sm: "100%", xs: "100%" } }}>
+          <InputLabel
+            sx={{
+              marginLeft: 2.5,
+            }}
+            size="small"
+            id="demo-multiple-checkbox-label"
+          >
+            Diet Filter
+          </InputLabel>
+          <Select
+            labelId="demo-multiple-checkbox-label"
+            id="demo-multiple-checkbox"
+            multiple
+            size="small"
+            color="success"
+            sx={{
+              borderRadius: 2,
+              ml: 2,
+            }}
+            value={personName}
+            onChange={handleChange}
+            input={<OutlinedInput label="Diet Filter" />}
+            renderValue={(selected) => selected.join(", ")}
+          >
+            {names.map((name) => (
+              <MenuItem key={name} value={name}>
+                <Checkbox checked={personName.indexOf(name) > -1} />
+                <ListItemText primary={name} />
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </Container>
       {!isLoading ? (
         <Container maxWidth="xl">
@@ -135,7 +200,7 @@ export const FoodItems = ({ selectedCategory }) => {
             spacing={3}
             columns={{ xs: 12, sm: 4, md: 9, lg: 16 }}
           >
-            {foodData?.foodItems?.map((food) => (
+            {foodData?.foodItems?.map((food, index) => (
               <Grid
                 item
                 xs={12}
@@ -146,14 +211,26 @@ export const FoodItems = ({ selectedCategory }) => {
                 component={motion.div}
                 whileHover={{ scale: 1.05, cursor: "pointer" }}
                 onClick={() => handleOpen(food.idMeal)}
+                sx={{ position: "relative" }}
               >
+                <Chip
+                  sx={{
+                    position: "absolute",
+                    right: 0,
+                    marginTop: 2,
+                    marginRight: 2,
+                    backgroundColor: "#dcfce7",
+                    color: "green",
+                  }}
+                  label="Available"
+                />
                 <Card
                   key={food.idMeal}
                   sx={{
                     height: 350,
                     borderRadius: 5,
                     border: "7px solid #22c55e",
-                    boxShadow: "5px 5px 20px 5px rgba(0,0,0,0.1)",
+                    boxShadow: "5px 5px 20px 5px rgba(0,0,0,0.2)",
                   }}
                 >
                   <LazyLoad>
@@ -179,7 +256,11 @@ export const FoodItems = ({ selectedCategory }) => {
                       variant="body"
                       fontWeight="bold"
                     >
-                      Price: {Math.ceil(foodDetails?.idMeal / 3000) * 5} BDT
+                      Price:{" "}
+                      {Math.ceil(food?.idMeal / 3000) *
+                        5 *
+                        Math.ceil(Math.random() * 10)}{" "}
+                      BDT
                     </Typography>
                     <Typography sx={{ color: "gray" }} variant="body2">
                       This is a healthy Food. Which can produce vitamine to your
