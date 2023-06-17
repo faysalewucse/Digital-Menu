@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Card,
   CardContent,
   CardMedia,
@@ -29,39 +30,26 @@ import { HashLoader } from "react-spinners";
 
 export const FoodItems = ({ selectedCategory }) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [foodDetails, setFoodDetails] = useState(null);
-  const [personName, setPersonName] = useState([]);
+  const [dietItems, setDietItems] = useState([]);
 
   const handleChange = (event) => {
     const {
       target: { value },
     } = event;
-    setPersonName(
-      // On autofill we get a stringified value.
-      typeof value === "string" ? value.split(",") : value
-    );
+    setDietItems(typeof value === "string" ? value.split(",") : value);
   };
 
-  const names = [
-    "Oliver Hansen",
-    "Van Henry",
-    "April Tucker",
-    "Ralph Hubbard",
-    "Omar Alexander",
-    "Carlos Abbott",
-    "Miriam Wagner",
-    "Bradley Wilkerson",
-    "Virginia Andrews",
-    "Kelly Snyder",
-  ];
+  const names = ["Milk", "Suger", "Gluten", "Dairy", "Butter"];
 
   // For Modal
   const [open, setOpen] = useState(false);
   const handleOpen = async (foodId) => {
     try {
       const response = await axios.get(
-        `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${foodId}`
+        `${import.meta.env.VITE_FOOD_DETAILS_API}${foodId}`
       );
       setFoodDetails(response.data.meals[0]);
       setOpen(true);
@@ -124,6 +112,29 @@ export const FoodItems = ({ selectedCategory }) => {
     },
   });
 
+  const applyDietFilter = async () => {
+    setLoading(true);
+    let filteredFoodId = [];
+    for (let i = 0; i < foodData.foodItems.length; i++) {
+      const response = await axios.get(
+        `${import.meta.env.VITE_FOOD_DETAILS_API}${
+          foodData.foodItems[i].idMeal
+        }`
+      );
+
+      [...Array(20).keys()].map((_, index) => {
+        const ingredient =
+          response?.data?.meals[0]["strIngredient" + (index + 1)];
+
+        if (ingredient && dietItems.includes(ingredient)) {
+          filteredFoodId.push(response?.data?.meals[0].idMeal);
+        }
+      });
+    }
+
+    setLoading(false);
+  };
+
   useEffect(() => {
     refetch();
   }, [searchValue, currentPage]);
@@ -141,7 +152,15 @@ export const FoodItems = ({ selectedCategory }) => {
 
   return (
     <Box>
-      <Container maxWidth="xl" sx={{ marginBottom: 2 }}>
+      <Container
+        maxWidth="xl"
+        sx={{
+          marginBottom: 5,
+          display: { md: "flex" },
+          alignItems: "center",
+          gap: 2,
+        }}
+      >
         <TextField
           label="Search Food"
           variant="outlined"
@@ -149,7 +168,6 @@ export const FoodItems = ({ selectedCategory }) => {
           size="small"
           focused
           sx={{
-            marginBottom: 2,
             width: { md: "30%", sm: "100%", xs: "100%" },
           }}
           InputProps={{
@@ -159,41 +177,54 @@ export const FoodItems = ({ selectedCategory }) => {
           }}
           onKeyDown={handleSearch}
         />
-        <FormControl sx={{ width: { md: "70%", sm: "100%", xs: "100%" } }}>
-          <InputLabel
+        <Box display="flex" width="100%" sx={{ marginTop: { md: 0, xs: 2 } }}>
+          <FormControl
             sx={{
-              marginLeft: 2.5,
+              width: "100%",
             }}
-            size="small"
-            id="demo-multiple-checkbox-label"
           >
-            Diet Filter
-          </InputLabel>
-          <Select
-            labelId="demo-multiple-checkbox-label"
-            id="demo-multiple-checkbox"
-            multiple
-            size="small"
+            <InputLabel
+              sx={{
+                marginLeft: { md: 2.5, xs: 0.5 },
+              }}
+              size="small"
+              id="demo-multiple-checkbox-label"
+            >
+              Diet Filter
+            </InputLabel>
+            <Select
+              labelId="demo-multiple-checkbox-label"
+              id="demo-multiple-checkbox"
+              multiple
+              size="small"
+              color="success"
+              sx={{
+                borderRadius: 2,
+              }}
+              value={dietItems}
+              onChange={handleChange}
+              input={<OutlinedInput label="Diet Filter" />}
+              renderValue={(selected) => selected.join(", ")}
+            >
+              {names.map((name) => (
+                <MenuItem key={name} value={name}>
+                  <Checkbox checked={dietItems.indexOf(name) > -1} />
+                  <ListItemText primary={name + " free"} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <Button
             color="success"
-            sx={{
-              borderRadius: 2,
-              ml: 2,
-            }}
-            value={personName}
-            onChange={handleChange}
-            input={<OutlinedInput label="Diet Filter" />}
-            renderValue={(selected) => selected.join(", ")}
+            sx={{ width: "100px", marginLeft: 1, borderRadius: 2 }}
+            variant="outlined"
+            onClick={applyDietFilter}
           >
-            {names.map((name) => (
-              <MenuItem key={name} value={name}>
-                <Checkbox checked={personName.indexOf(name) > -1} />
-                <ListItemText primary={name} />
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+            Apply
+          </Button>
+        </Box>
       </Container>
-      {!isLoading ? (
+      {!isLoading && !loading ? (
         <Container maxWidth="xl">
           <Grid
             container
@@ -395,7 +426,7 @@ export const FoodItems = ({ selectedCategory }) => {
         >
           <HashLoader
             color="green"
-            loading={isLoading}
+            loading={isLoading || loading}
             size={50}
             aria-label="Loading Spinner"
             data-testid="loader"
